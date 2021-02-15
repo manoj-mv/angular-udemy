@@ -6,7 +6,10 @@
 <hr>
 <div class="row">
   <div class="col-xs-12">
-    <app-recipe-item *ngFor="let recipe of recipes" [recipe_item]="recipe"></app-recipe-item>
+    <app-recipe-item *ngFor="let recipe of recipes" 
+    [recipe_item]="recipe"
+    (onItemSelectedEvent) = "propagateSelectedItemToParent(recipe)"
+    >
+    </app-recipe-item>
   </div>
 </div>
-<app-recipe-item></app-recipe-item>
