@@ -20,6 +20,6 @@ export class AccountComponent {
   onSetTo(status: string) {
     this.accountService.addStatus(this.id,status);
     // this.logStatus.logStatusChange(status);
-    this.accountService.statusUpdated.emit(status);
+    this.accountService.statusUpdated.emit(status); 
   }
 }
