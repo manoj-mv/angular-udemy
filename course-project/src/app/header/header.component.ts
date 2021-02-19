@@ -1,5 +1,5 @@
 import {
-  Component, Output, EventEmitter
+  Component
 } from '@angular/core';
 
 @Component({
@@ -7,9 +7,4 @@ import {
   templateUrl: './header.component.html'
 })
 export class HeaderComponent {
-  @Output() featureSelected = new EventEmitter<string>();
-  onSelect(feature: string) {
-    this.featureSelected.emit(feature);
-  }
-
 }
