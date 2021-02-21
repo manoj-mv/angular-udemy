@@ -16,7 +16,12 @@ const appRoutes:Routes = [
         {path:':id/edit',component:RecipeEditComponent}
     ]
     },
-    {path:'shopping-list', component: ShoppingListComponent}
+    {path:'shopping-list', component: ShoppingListComponent,
+        children:[
+            // {path:':id/edit',}
+        ]
+    }
+
 ];
 
 @NgModule({

@@ -24,6 +24,7 @@ export class AppComponent implements OnInit {
       'hobbies': new FormArray([]),
     });
 
+    // subscriber to watch form control status
     this.signUpForm.get('userData.email').statusChanges
       .subscribe((status)=>{
         console.log(status);

@@ -23,6 +23,13 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     )
   }
 
+  onEditItem(editId:number){
+    console.log(editId);
+    // pass id of the ingredient to be edited using subject
+    this.shoppingListService.editIngredientSubject.next(editId);
+  }
+
+
   ngOnDestroy(){
     this.ingredentChangeSubscription.unsubscribe();
   }
