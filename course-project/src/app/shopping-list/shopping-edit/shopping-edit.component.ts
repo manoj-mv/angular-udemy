@@ -1,10 +1,12 @@
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { Ingredient } from 'src/app/shared/ingredient.model';
-import { ShoppingListService } from '../shopping-list.service';
 
+import * as shoppingListActions from '../store/shopping-list.actions';
+import * as fromApp from '../../store/app.reducer';
 @Component({
   selector: 'app-shopping-edit',
   templateUrl: './shopping-edit.component.html',
@@ -14,27 +16,43 @@ export class ShoppingEditComponent implements OnInit ,OnDestroy{
   // @ViewChild('nameInput') name;
   // @ViewChild('amountInput') amount;
   // @Output() ingredientAddedEvent = new EventEmitter<Ingredient>();
-  editIdsubscription :Subscription;
+  editSubscription :Subscription;
   edit_Id:number;
   editMode:boolean =false;
   IngredientToEdit:Ingredient;
   @ViewChild('IngredientForm') ingredientForm:NgForm;
-  constructor(private shoppingListService:ShoppingListService) { }
+  constructor(private store: Store<fromApp.AppState> ) { }
 
   ngOnInit(): void {
-    this.editIdsubscription = this.shoppingListService.editIngredientSubject
-      .subscribe(
-        (editId:number)=>{
-          this.editMode=true;
-          this.edit_Id = editId;
-          this.IngredientToEdit = this.shoppingListService.getIngredient(this.edit_Id);
-          // console.log(this.IngredientToEdit,this.ingredientForm);
+
+    this.editSubscription = this.store.select('shoppingList').subscribe(
+      stateData =>{
+        if(stateData.editedIngredientIndex > -1){
+          this.editMode = true;
+          this.IngredientToEdit = stateData.editedIngredient;
           this.ingredientForm.setValue({
             name:this.IngredientToEdit.name,
             amount : this.IngredientToEdit.amount
-          })
+          });
         }
-      )
+        else{
+          this.editMode = false;
+        }
+      }
+    );
+    // this.editIdsubscription = this.shoppingListService.editIngredientSubject
+    //   .subscribe(
+    //     (editId:number)=>{
+    //       this.editMode=true;
+    //       this.edit_Id = editId;
+    //       this.IngredientToEdit = this.shoppingListService.getIngredient(this.edit_Id);
+    //       // console.log(this.IngredientToEdit,this.ingredientForm);
+    //       this.ingredientForm.setValue({
+    //         name:this.IngredientToEdit.name,
+    //         amount : this.IngredientToEdit.amount
+    //       })
+    //     }
+    //   )
   }
   // add or update ingredient
   onSubmit(formRef:NgForm){
@@ -45,10 +63,13 @@ export class ShoppingEditComponent implements OnInit ,OnDestroy{
     const amount_needed = formVals.amount;
     const ingredient = new Ingredient(IngredientName,amount_needed);
     if(this.editMode){
-      this.shoppingListService.updateIngredient(this.edit_Id,ingredient);
+      // this.shoppingListService.updateIngredient(this.edit_Id,ingredient);
+      this.store.dispatch(new shoppingListActions.UpdateIngredient({ingredient: ingredient}));
+      this.store.subscribe(data=> console.log(data));
     }
     else{
-      this.shoppingListService.addIngredient(ingredient);
+      // this.shoppingListService.addIngredient(ingredient);
+      this.store.dispatch(new shoppingListActions.AddIngredient(ingredient)); 
     }
     this.editMode=false;
     formRef.reset();
@@ -58,14 +79,17 @@ export class ShoppingEditComponent implements OnInit ,OnDestroy{
   onClear(){
     this.ingredientForm.reset();
     this.editMode=false;
+    this.store.dispatch(new shoppingListActions.stopEdit());
   }
 
   onDelete(){
-    this.shoppingListService.deleteIngredient(this.edit_Id);
+    // this.shoppingListService.deleteIngredient(this.edit_Id);
+    this.store.dispatch(new shoppingListActions.DeleteIngredient());
     this.onClear();
   }
 
   ngOnDestroy(){
-    this.editIdsubscription.unsubscribe();
+    this.editSubscription.unsubscribe();
+    this.store.dispatch(new shoppingListActions.stopEdit());
   }
 }
