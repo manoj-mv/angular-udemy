@@ -25,7 +25,7 @@ import { RecipeEffects } from './recipes/store/recipes.effects';
   ],
   imports: [
     // core angular
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     FormsModule,
     HttpClientModule,
     StoreModule.forRoot(fromApp.appReducer), 
